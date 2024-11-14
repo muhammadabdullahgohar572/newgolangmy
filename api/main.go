@@ -1,4 +1,4 @@
-package Handler
+package main
 
 import (
 	"context"
@@ -16,7 +16,7 @@ var mongoURI = "mongodb+srv://Abdullah1:Abdullah1@cluster0.agxpb.mongodb.net/?re
 var client *mongo.Client
 var usersCollection *mongo.Collection
 
-// Initialize MongoDB connection in init function
+// Initialize MongoDB connection
 func init() {
 	initMongo()
 }
@@ -30,12 +30,12 @@ func initMongo() {
 	usersCollection = client.Database("test").Collection("users")
 }
 
-// Handler function expected by Vercel to serve requests
+// Handler function for Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
 	// Initialize router and define routes
 	router := mux.NewRouter()
 
-	// Define a simple root route
+	// Root route
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -43,13 +43,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		})
 	}).Methods("GET")
 
-	// Set up CORS with desired options
+	// Set up CORS with options
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST"},
 		AllowedHeaders: []string{"Authorization", "Content-Type"},
 	}).Handler(router)
 
-	// Serve the request using the CORS handler
+	// Serve the request through the CORS handler
 	corsHandler.ServeHTTP(w, r)
 }
