@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
 	"github.com/gorilla/mux"
-	"github.com/rs/cors" 
+	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -29,11 +30,12 @@ func initMongo() {
 	usersCollection = client.Database("test").Collection("users")
 }
 
-func Handler() {
+// Handler function expected by Vercel to serve requests
+func Handler(w http.ResponseWriter, r *http.Request) {
 	// Initialize router and define routes
 	router := mux.NewRouter()
 
-	// Print a custom message when the root route is accessed
+	// Define a simple root route
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -48,9 +50,6 @@ func Handler() {
 		AllowedHeaders: []string{"Authorization", "Content-Type"},
 	}).Handler(router)
 
-	// Start the HTTP server
-	log.Println("Starting server on port 8080...")
-	if err := http.ListenAndServe(":8080", corsHandler); err != nil {
-		log.Fatal("Server failed to start:", err)
-	}
+	// Serve the request using the CORS handler
+	corsHandler.ServeHTTP(w, r)
 }
